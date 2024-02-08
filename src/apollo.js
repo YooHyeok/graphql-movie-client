@@ -5,7 +5,8 @@ const client = new ApolloClient({
   cache: new InMemoryCache(), /* 데이터 캐시 객체 */
 })
 
-client.query({
+/* 클라이언트 쿼리조회 테스트 */
+/* client.query({
   query: gql `
     {
       allMovies {
@@ -13,6 +14,6 @@ client.query({
       }
     }
   `
-}).then(data=>console.log(data))
+}).then(data=>console.log(data)) */
 
 export default client
