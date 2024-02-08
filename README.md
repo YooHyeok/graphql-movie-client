@@ -42,3 +42,60 @@ client.query({
   `
 }).then(data=>console.log(data))
 ```
+
+```js
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import App from './App';
+import client from './apollo'; //클라이언트 쿼리조회 테스트
+
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(
+    <App />
+);
+```
+위와 같이 전역 컴포넌트에 import만 해도 조회가 된다.
+
+
+## React Apollo-Client 적용
+
+`ApolloProvider`를 사용하여 DOM 전역으로 client 객체를 제공해준다.
+
+```js
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import App from './App';
+import client from './apollo'; //클라이언트 쿼리조회 테스트
+
+import { ApolloProvider } from '@apollo/client';
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(
+  <ApolloProvider client={client}>
+    <App />
+  </ApolloProvider>
+);
+```
+
+각 컴포넌트에서 Provider로 부터 client를 제공받을 때에는 `useApolloClient`를 사용한다.
+```js
+import { gql, useApolloClient } from "@apollo/client"
+import { useEffect } from "react";
+
+export default function Movies() {
+  const client = useApolloClient();
+  useEffect(()=>{
+    
+    client.query({
+      query: gql `
+        {
+          allMovies {
+            title
+          }
+        }
+      `
+    }).then(result=>console.log(result))
+  }, [])
+  
+  return <div>This Is a List of Movie </div>
+}
+```
