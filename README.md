@@ -225,3 +225,21 @@ useQuery(GET_MOVIE, {variables: {
   }})
 ```
 
+## useApolloClient와 variables
+```js
+client.query({
+  query: gql`
+    query getMovie($movieId: String!) {
+      movie(id: $movieId) {
+        id
+        title
+      }
+    }
+  `,
+  variables: {
+    movieId: params.id
+  }
+})
+```
+useQuery에서는 두번째 매개변수로 전달하였으나 useApolloClient에서는 전달하는 객체 내의 두번째 속성으로 전달해야만 한다.
+또한 useQuery와 마찬가지로 query의 별칭과 arg타입을 필수적으로 지정해줘야한다.
