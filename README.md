@@ -243,3 +243,11 @@ client.query({
 ```
 useQuery에서는 두번째 매개변수로 전달하였으나 useApolloClient에서는 전달하는 객체 내의 두번째 속성으로 전달해야만 한다.
 또한 useQuery와 마찬가지로 query의 별칭과 arg타입을 필수적으로 지정해줘야한다.
+
+## Apollo Dev Tools
+Apollo Dev Tools 구글 확장프로그램이다.   
+useQuery를 지원해준다.    
+아쉽게도 useApolloClient는 지원되지 않는거 같다.    
+api호출시 호출된 query들의 별칭 목록을 히스토리로 제공한다.
+Mutation이나 cache또한 히스토리로 제공한다.
+Explorer를 통해 현재 Apollo-client가 통신중인 Apollo-server의 query를 조작할 수 있게끔 제공한다.    
