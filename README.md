@@ -260,3 +260,8 @@ Apollo client가 제공하는 캐시 기능이다.
 
 예를들어 id title에 대한 정보를 조회하면 apollo가 InMemoryCache로 캐싱처리를 하는데 이때 코드를살짝 바꿔서 필드하나를 더 조회한다면 id, title을 포함한 모든 필드를 다시 조회하지만 기존 캐시와 비교한 뒤 추가된 필드만 골라서 캐시객체에 넣어주게 된다.
 (이때 캐시에 저장된 객체 형태를 엔티티라고 부른다.)
+
+## Sass, StyledComponent
+```
+> npm i sass styled-components
+```
