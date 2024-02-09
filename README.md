@@ -79,9 +79,10 @@ root.render(
 각 컴포넌트에서 Provider로 부터 client를 제공받을 때에는 `useApolloClient`를 사용한다.
 ```js
 import { gql, useApolloClient } from "@apollo/client"
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 export default function Movies() {
+  const [data, setData] = useState([]);
   const client = useApolloClient();
   useEffect(()=>{
     
@@ -93,9 +94,112 @@ export default function Movies() {
           }
         }
       `
-    }).then(result=>console.log(result))
+    }).then(setData)
   }, [])
   
-  return <div>This Is a List of Movie </div>
+  return <div>{JSON.stringIfy(data.allMovies)}</div>
+}
+```
+
+## useQuery 선언형 방식
+이전에 적용했던 코드 방식은 명령형 코드 방식이다.
+명령형 코드는 단계별로 진행된다.
+이전 코드방식은 useEffect를 사용하여 client가 로딩되면 client로 부터 query함수를 통해 쿼리 요청을 보낸뒤, useState를 통해 state에 저장하는 등의 단계로 진행된다.
+
+선언형 방식은 이러한 단계를 생략하고 원하는것을 작성하기만한다.
+apollo/client에서는 useEffect, useState, useApolloClient 훅들을 생략하고 useQuery라는 단 하나의 훅으로만 조회를 할 수 있도록 제공해준다.
+
+```js
+import {gql, useQuery } from "@apollo/client"
+
+const ALL_MOVIES = gql`
+  query getMovies {
+    allMovies 
+      {
+        id
+        title
+      }
+  }
+`
+
+export default function Movies() {
+  const result = useQuery(ALL_MOVIES)
+  
+  return <div>{JSON.stringIfy(result.allMovies)}</div>
+}
+```
+
+실제 코드상에서는 코드량의 차이가 얼마 없지만, 반환받는 여러 데이터값의 활용에 따라 코드차이가 확연히 난다.
+
+```js
+import { gql, useApolloClient } from "@apollo/client"
+import { useEffect, useState } from "react";
+
+export default function Movies() {
+  const [{data, loading, error}=result, setResult] = useState({data: null, loading: true, error: false });
+  const client = useApolloClient();
+
+  useEffect(()=>{
+    client.query({
+      query: gql `
+        {
+          allMovies {
+            id
+            title
+          }
+        }
+      `
+    }).then(result=>{
+      setResult(result)
+    }).catch(error=>{
+      console.log(error)
+      setResult(result=>({...result, error:true}))
+    })
+  }, [client])
+
+  const {data, loading, error} = result
+  if(!error && (loading)) {
+    return <h1>Loading....</h1>
+  }
+  if(error) {
+    return <h1>Could not fetch :(</h1>
+  }
+    return (<div>
+    <ul>
+      {data.allMovies.map(movie=> (<li key={movie.id}>{movie.title}</li>))} 
+      </ul>
+  </div>)
+} 
+```
+반환받는 데이터에는 data, loading이 함께 딸려오는데 여러 데이터들을 토대로 다른 출력 결과물을 반환하는 코드를 작성한다면, 위의 명령형코드 보다 선언형 코드 방식이 훨씬 간결해진다.
+
+```js
+import {gql, useQuery } from "@apollo/client"
+
+const ALL_MOVIES = gql`
+  query getMovies {
+    allMovies 
+      {
+        id
+        title
+      }
+  }
+`
+
+export default function Movies() {
+
+  const {data, loading, error} = useQuery(ALL_MOVIES)
+  if(loading) {
+    return <h1>Loading....</h1>
+  }
+  if(error) {
+    console.log(error)
+    return <h1>Could not fetch :(</h1>
+  }
+  return <div>
+    <ul>
+    {data.allMovies.map(movie=> (<li key={movie.id}>{movie.title}</li>))} 
+      </ul>
+  </div>
 }
 ```
