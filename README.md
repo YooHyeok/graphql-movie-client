@@ -203,3 +203,25 @@ export default function Movies() {
   </div>
 }
 ```
+
+## useQuery와 variables
+useQuery의 두번째 인자에 넣어준다.
+이때 gql에 선언한 SDL query의 별칭은 필수이다.
+
+```js
+const GET_MOVIE = gql`
+  query getMovie($movieId: String!) { # 별칭과 arg타입을 지정하여 넘겨야 한다.
+    movie(id:$movieId) {
+      id
+      title
+    }
+  }
+`
+```
+
+```js
+useQuery(GET_MOVIE, {variables: {
+    movieId: params.id
+  }})
+```
+
