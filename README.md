@@ -251,3 +251,12 @@ useQuery를 지원해준다.
 api호출시 호출된 query들의 별칭 목록을 히스토리로 제공한다.
 Mutation이나 cache또한 히스토리로 제공한다.
 Explorer를 통해 현재 Apollo-client가 통신중인 Apollo-server의 query를 조작할 수 있게끔 제공한다.    
+
+## InMemoryCache
+Apollo client가 제공하는 캐시 기능이다.   
+데이터를 fetch한 후 cache에 저장한다.   
+한번 조회했던 데이터는 다시 fetch하지 않고 메모리에 캐싱된 데이터를 불러온다.   
+또한, 중간에 gql을 변경하여 필드를 추가하거나 제거한다면 기존 캐싱된 객체로부터 추가/제거 처리한다.
+
+예를들어 id title에 대한 정보를 조회하면 apollo가 InMemoryCache로 캐싱처리를 하는데 이때 코드를살짝 바꿔서 필드하나를 더 조회한다면 id, title을 포함한 모든 필드를 다시 조회하지만 기존 캐시와 비교한 뒤 추가된 필드만 골라서 캐시객체에 넣어주게 된다.
+(이때 캐시에 저장된 객체 형태를 엔티티라고 부른다.)
