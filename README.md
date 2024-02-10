@@ -265,3 +265,56 @@ Apollo client가 제공하는 캐시 기능이다.
 ```
 > npm i sass styled-components
 ```
+
+## Remote Fields와 LocalOnlyFields
+
+remoteField는 API의 type에 정의한 Field들이다.    
+localOnlyFields는 API에 정의한 type에 없는 Field이다.   
+데이터 조회시 지정하였다고 하더라도, 실제로 서버에서는 해당 필드 기준으로 조회하지는 않는다.(무시됨)    
+오직 Apollo 서버의 Cache에서만 활동하는 Field이다.
+필드 우측에 `@client` 키워드를 선언함으로써 서버에게 알려준다.    
+
+
+```js
+const GET_DATA = gql`
+  query getData($id: String!) {
+    data(id:$id) {
+      id
+      title
+      isLiked @client # local only fields 생략 한다면 cache에 값을 줄수는 있으나 데이터 참조는 불가능해진다.
+    }
+  }
+`
+```
+
+## LocalOnlyFields와 WriteFragment
+
+client객체의 cache객체로부터 `writeFragment` 함수를 통해 LocalOnlyFields를 수정할 수 있다.
+
+우선 client객체로 부터 cache를 받는다
+```js
+const {data, loading, client: {cache}} = useQuery(GET_DATA, {variables: {
+    id: params.id
+  }})
+```
+
+이벤트 핸들러 함수에서 아래와 같이 cache로 부터 writeFragment함수를 호출하여 데이터를 조작한다.
+
+```js
+
+  const onClick = () => {
+    cache.writeFragment({
+      id: `Data:${params.id}`, // type이름 : 조회했던 PK argument
+      fragment: gql`fragment DataFragment on Data {isLiked}`, // DataFragment라는 별칭의 fragment로 Data타입의 isLiked필드를 수정하겠다는 의미
+      data:{isLiked: !data.data.isLiked}, //실제 수정할 필드의 데이터
+    })
+  }
+```
+
+### Fragment
+ - #### *`id 속성`*
+    수정하고 싶은 객체로 ApolloDevTools에서 확인 가능하며, 키는 API상에서 작동한 resolover에 해당하는 type이름이고 value는 argument로 넘긴 PK값이다.
+ - #### *`fragment 속성`*    
+    API상에서 수정하고싶은 field를 지정한다. (API에 없는 local Only Field도 수정 가능...) 이때 별칭을 지정하고 on절 뒤에 API상의 type이름을 명시해야한다.
+ - #### *`data 속성`*    
+    실제로 수정할 필드의 데이터를 입력한다. data: {필드명:값} 형태로 작성한다
